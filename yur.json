@@ -1,0 +1,16 @@
+[
+  {
+    "id": "2",
+    "name": "Beispiel 2",
+    "text": "Dies ist ein zweiter Beispieltext",
+    "description": "Eine weitere detaillierte Beschreibung",
+    "date": "2024-06-05"
+  },
+  {
+    "id": "3",
+    "name": "Beispiel 3",
+    "text": "Dies ist ein dritter Beispieltext",
+    "description": "Noch eine detaillierte Beschreibung",
+    "date": "2024-06-05"
+  }
+]
