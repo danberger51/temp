@@ -28,11 +28,11 @@ app.http('addComment', {
     extraOutputs: [cosmosOutput],
     handler: async (request, context) => {
        
-        console.log(`Received request to add comment for filmId: ${filmId}`);
+        
         
 
         const filmResult = context.extraInputs.get(cosmosInput);
-        console.log(`Query result: ${JSON.stringify(filmResult)}`);
+        
 
         if (filmResult.length === 0) {
             console.log(`Film with id ${filmId} not found.`);
@@ -57,8 +57,7 @@ app.http('addComment', {
         }
         film.comments.push(comment);
 
-        // Ensure the output binding is set correctly
-        context.bindings.cosmosOutput = film;
+        
 
         console.log(`Updated film document: ${JSON.stringify(film)}`);
 
