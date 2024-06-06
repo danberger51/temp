@@ -31,7 +31,7 @@ app.http('addComment', {
         
         
 
-        const filmResult = context.extraInputs.get(cosmosInput);
+        
 
         if (filmResult.length === 0) {
             console.log(`Film with id ${filmId} not found.`);
@@ -41,7 +41,7 @@ app.http('addComment', {
             };
         }
 
-        const film = filmResult; // Access the first element of the result array
+        const film = filmResult; 
         const comment = {
             id: uuidv4(),
             userId: request.body.userId,
