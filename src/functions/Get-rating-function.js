@@ -3,8 +3,8 @@ const { app, input } = require('@azure/functions');
 const cosmosInput = input.cosmosDB({
     databaseName: 'FilmDatabase',
     containerName: 'Films',
-    connection: 'CosmosDB',  
-    sqlQuery: "SELECT c.ratings FROM c WHERE c.id = @filmId",
+    connection: 'CosmosDB',
+    sqlQuery: "SELECT VALUE rating.rating FROM c JOIN rating IN c.ratings WHERE c.id = {filmId} AND (rating.rating = '👍' OR rating.rating = '👎')",
     parameters: [
         {
             name: "@filmId",
@@ -16,17 +16,15 @@ const cosmosInput = input.cosmosDB({
 app.http('getRatings', {
     methods: ['GET'],
     authLevel: 'anonymous',
-    route: 'films/{filmId}/ratings',
+    route: 'films/{filmId}/ratings/rating',
     extraInputs: [cosmosInput],
     handler: async (request, context) => {
-        const filmId = context.bindingData.filmId;
-        cosmosInput.parameters[0].value = filmId;  
         
         const ratings = context.extraInputs.get(cosmosInput);
         
         if (ratings.length > 0) {
             return {
-                body: JSON.stringify(ratings[0].ratings || []),
+                body: JSON.stringify(ratings),
                 status: 200
             };
         } else {

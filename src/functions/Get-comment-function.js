@@ -4,7 +4,7 @@ const cosmosInput = input.cosmosDB({
     databaseName: 'FilmDatabase',
     containerName: 'Films',
     connection: 'CosmosDB', 
-    sqlQuery: "SELECT c.comments FROM c WHERE c.id = @filmId",
+    sqlQuery: "SELECT VALUE comment.content FROM c JOIN comment IN c.comments WHERE c.id = {filmId}",
     parameters: [
         {
             name: "@filmId",
@@ -16,17 +16,17 @@ const cosmosInput = input.cosmosDB({
 app.http('getComments', {
     methods: ['GET'],
     authLevel: 'anonymous',
-    route: 'films/{filmId}/comments',
+    route: 'films/{filmId}/comments/content',
     extraInputs: [cosmosInput],
     handler: async (request, context) => {
-        const filmId = context.bindingData.filmId;
-        cosmosInput.parameters[0].value = filmId;  d
+        
+
         
         const commentsResult = context.extraInputs.get(cosmosInput);
         
         if (commentsResult.length > 0) {
             return {
-                body: JSON.stringify(commentsResult[0].comments || []),
+                body: JSON.stringify(commentsResult),
                 status: 200
             };
         } else {
