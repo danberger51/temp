@@ -29,7 +29,7 @@ app.http('addComment', {
     extraOutputs: [cosmosOutput],
     handler: async (request, context) => {
         const filmId = context.bindingData.filmId;
-        cosmosInput.parameters[0].value = filmId;
+        cosmosInput.parameters.value = filmId;
 
         const filmResult = context.extraInputs.get(cosmosInput);
 
@@ -41,7 +41,7 @@ app.http('addComment', {
             };
         }
 
-        const film = filmResult[0]; // Access the first element of the result array
+        const film = filmResult; // Access the first element of the result array
         const comment = {
             id: uuidv4(),
             userId: request.body.userId,
