@@ -1,13 +1,22 @@
-const { app } = require('@azure/functions');
+const { app, input } = require('@azure/functions');
 
-app.http('Get-movie-function', {
-    methods: ['GET', 'POST'],
+const cosmosInput = input.cosmosDB({
+    databaseName: 'FilmDatabase',
+    containerName: 'Films',
+    connection: 'CosmosDB',  
+    sqlQuery: "SELECT * FROM c"
+});
+
+app.http('getFilms', {
+    methods: ['GET'],
     authLevel: 'anonymous',
+    extraInputs: [cosmosInput],
+    route: 'films',
     handler: async (request, context) => {
-        context.log(`Http function processed request for url "${request.url}"`);
-
-        const name = request.query.get('name') || await request.text() || 'world';
-
-        return { body: `Hello, ${name}!` };
+        const films = context.extraInputs.get(cosmosInput);
+        return {
+            body: JSON.stringify(films),
+            status: 200
+        };
     }
 });
