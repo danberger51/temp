@@ -49,7 +49,7 @@ app.http('addComment', {
             date: new Date().toISOString()
         };
         
-        console.log(`New comment: ${JSON.stringify(comment)}`);
+        
 
         if (!film.comments) {
             film.comments = [];
