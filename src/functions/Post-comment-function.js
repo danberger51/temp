@@ -1,11 +1,11 @@
 const { app, input, output } = require('@azure/functions');
-const { v4: uuidv4 } = require('uuid');
+
 
 const cosmosInput = input.cosmosDB({
     databaseName: 'FilmDatabase',
     containerName: 'Films',
     connection: 'CosmosDB',
-    sqlQuery: "SELECT * FROM c WHERE c.id = '1'",
+    sqlQuery: "SELECT * FROM c WHERE c.id = {filmId}",
     parameters: [
         {
             name: "@filmId",
@@ -24,10 +24,10 @@ const cosmosOutput = output.cosmosDB({
 app.http('addComment', {
     methods: ['POST'],
     authLevel: 'anonymous',
-    route: 'films/1/comments',
+    route: 'films/{filmId}/comments',
     handler: async (request, context) => {
         const data = await request.json();
-    data.id = (Math.random() + 1).toString(36);
+        data.id = (Math.random() + 1).toString(36);
 
     console.log(data);
 
