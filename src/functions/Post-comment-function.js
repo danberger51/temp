@@ -57,7 +57,8 @@ app.http('addComment', {
         }
         film.comments.push(comment);
 
-        
+        // Ensure the output binding is set correctly
+        context.bindings.cosmosOutput = film;
 
         console.log(`Updated film document: ${JSON.stringify(film)}`);
 
