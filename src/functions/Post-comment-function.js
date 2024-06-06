@@ -29,12 +29,12 @@ app.http('addComment', {
     extraOutputs: [cosmosOutput],
     handler: async (request, context) => {
         const data = {
-            id: uuidv4(),
+            id: (Math.random() + 1).toString(36),
             userId: request.body.userId,
             content: request.body.content,
             date: new Date().toISOString()}
 
-        data.id = (Math.random() + 1).toString(36);
+        
 
         console.log(data);
 
