@@ -29,7 +29,7 @@ app.http('addComment', {
     extraOutputs: [cosmosOutput],
     handler: async (request, context) => {
         
-        cosmosInput.parameters.value = filmId;
+        
 
         const filmResult = context.extraInputs.get(cosmosInput);
 
@@ -56,7 +56,7 @@ app.http('addComment', {
         }
         film.comments.push(comment);
 
-        // Ensure the output binding is set correctly
+        
         
 
         console.log(`Updated film document: ${JSON.stringify(film)}`);
