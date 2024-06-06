@@ -1,5 +1,5 @@
 const { app, input, output } = require('@azure/functions');
-const { v4: uuidv4 } = require('uuid');
+
 
 const cosmosInput = input.cosmosDB({
     databaseName: 'FilmDatabase',
@@ -17,7 +17,8 @@ const cosmosInput = input.cosmosDB({
 const cosmosOutput = output.cosmosDB({
     databaseName: 'FilmDatabase',
     containerName: 'Films',
-    connection: 'CosmosDB'
+    connection: 'CosmosDB',
+    createIfNotExists: true
 });
 
 app.http('addComment', {
@@ -29,8 +30,7 @@ app.http('addComment', {
     handler: async (request, context) => {
        
         
-        
-
+    
         const filmResult = context.extraInputs.get(cosmosInput);
         
 
@@ -42,7 +42,7 @@ app.http('addComment', {
             };
         }
 
-        const film = filmResult[0];
+        const film = filmResult;
         const comment = {
             id: uuidv4(),
             userId: request.body.userId,
@@ -57,14 +57,11 @@ app.http('addComment', {
         }
         film.comments.push(comment);
 
-        // Ensure the output binding is set correctly
-        context.bindings.cosmosOutput = film;
+        
 
         console.log(`Updated film document: ${JSON.stringify(film)}`);
 
-        return {
-            status: 201,
-            body: comment
-        };
+        return { body: JSON.stringify(data), status: 201 }
+        
     }
 });
