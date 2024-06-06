@@ -1,5 +1,5 @@
 const { app, input, output } = require('@azure/functions');
-
+const { v4: uuidv4 } = require('uuid');
 
 const cosmosInput = input.cosmosDB({
     databaseName: 'FilmDatabase',
@@ -18,31 +18,59 @@ const cosmosOutput = output.cosmosDB({
     databaseName: 'FilmDatabase',
     containerName: 'Films',
     connection: 'CosmosDB',
-    createIfNotExists: true
+    createIfNotExists: false
 });
 
 app.http('addComment', {
     methods: ['POST'],
     authLevel: 'anonymous',
     route: 'films/{filmId}/comments',
-    extraInputs: [cosmosInput],
-    extraOutputs: [cosmosOutput],
     handler: async (request, context) => {
-        const data = {
-            id: (Math.random() + 1).toString(36),
-            userId: request.body.userId,
-            content: request.body.content,
-            date: new Date().toISOString()}
+        try {
+            const filmId = context.bindingData.filmId;
+            cosmosInput.parameters[0].value = filmId;
 
-        
+            const filmResult = context.extraInputs.get(cosmosInput);
 
-        console.log(data);
+            console.log(`Film result for id ${filmId}: ${JSON.stringify(filmResult)}`);
 
-        context.extraOutputs.set(cosmosOutput, data);
+            if (!filmResult || filmResult.length === 0) {
+                console.log(`Film with id ${filmId} not found.`);
+                return {
+                    status: 404,
+                    body: "Film nicht gefunden."
+                };
+            }
 
-        return { body: JSON.stringify(data), status: 201 };
-        
+            const film = filmResult[0];
+            const comment = {
+                id: uuidv4(),
+                userId: request.body.userId,
+                content: request.body.content,
+                date: new Date().toISOString()
+            };
 
-    
+            console.log(`New comment: ${JSON.stringify(comment)}`);
+
+            if (!film.comments) {
+                film.comments = [];
+            }
+            film.comments.push(comment);
+
+            context.bindings.cosmosOutput = film;
+
+            console.log(`Updated film document: ${JSON.stringify(film)}`);
+
+            return {
+                status: 201,
+                body: comment
+            };
+        } catch (error) {
+            console.error(`Error adding comment: ${error.message}`, error);
+            return {
+                status: 500,
+                body: `Internal server error: ${error.message}`
+            };
+        }
     }
 });
