@@ -28,11 +28,10 @@ app.http('addComment', {
     extraInputs: [cosmosInput],
     extraOutputs: [cosmosOutput],
     handler: async (request, context) => {
-       
-        
-    
+        const filmId = context.bindingData.filmId;
+        cosmosInput.parameters[0].value = filmId;
+
         const filmResult = context.extraInputs.get(cosmosInput);
-        
 
         if (filmResult.length === 0) {
             console.log(`Film with id ${filmId} not found.`);
@@ -42,7 +41,7 @@ app.http('addComment', {
             };
         }
 
-        const film = filmResult;
+        const film = filmResult[0]; // Access the first element of the result array
         const comment = {
             id: uuidv4(),
             userId: request.body.userId,
@@ -57,11 +56,14 @@ app.http('addComment', {
         }
         film.comments.push(comment);
 
-        
+        // Ensure the output binding is set correctly
+        context.bindings.cosmosOutput = film;
 
         console.log(`Updated film document: ${JSON.stringify(film)}`);
 
-        return { body: JSON.stringify(data), status: 201 }
-        
+        return {
+            status: 201,
+            body: comment
+        };
     }
 });
