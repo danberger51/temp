@@ -26,51 +26,17 @@ app.http('addComment', {
     authLevel: 'anonymous',
     route: 'films/1/comments',
     handler: async (request, context) => {
-        try {
-            const filmId = context.bindingData.filmId;
-            cosmosInput.parameters[0].value = filmId;
+        const data = await request.json();
+    data.id = (Math.random() + 1).toString(36);
 
-            const filmResult = context.extraInputs.get(cosmosInput);
+    console.log(data);
 
-            console.log(`Film result for id ${filmId}: ${JSON.stringify(filmResult)}`);
+    context.extraOutputs.set(cosmosOutput, data);
 
-            if (!filmResult || filmResult.length === 0) {
-                console.log(`Film with id ${filmId} not found.`);
-                return {
-                    status: 404,
-                    body: "Film nicht gefunden."
-                };
-            }
-
-            const film = filmResult[0];
-            const comment = {
-                id: uuidv4(),
-                userId: request.body.userId,
-                content: request.body.content,
-                date: new Date().toISOString()
-            };
-
-            console.log(`New comment: ${JSON.stringify(comment)}`);
-
-            if (!film.comments) {
-                film.comments = [];
-            }
-            film.comments.push(comment);
-
-            context.bindings.cosmosOutput = film;
-
-            console.log(`Updated film document: ${JSON.stringify(film)}`);
-
-            return {
-                status: 201,
-                body: comment
-            };
-        } catch (error) {
-            console.error(`Error adding comment: ${error.message}`, error);
-            return {
-                status: 500,
-                body: `Internal server error: ${error.message}`
-            };
-        }
+    return { body: JSON.stringify(data), status: 201 };
+            
+            
+        
+        
     }
 });
