@@ -28,42 +28,21 @@ app.http('addComment', {
     extraInputs: [cosmosInput],
     extraOutputs: [cosmosOutput],
     handler: async (request, context) => {
-        
-        
-
-        
-
-        if (filmResult.length === 0) {
-            console.log(`Film with id ${filmId} not found.`);
-            return {
-                status: 404,
-                body: "Film nicht gefunden."
-            };
-        }
-
-        const film = filmResult; 
-        const comment = {
+        const data = {
             id: uuidv4(),
             userId: request.body.userId,
             content: request.body.content,
-            date: new Date().toISOString()
-        };
-        
+            date: new Date().toISOString()}
+
+        data.id = (Math.random() + 1).toString(36);
+
+        console.log(data);
+
+        context.extraOutputs.set(cosmosOutput, data);
+
+        return { body: JSON.stringify(data), status: 201 };
         
 
-        if (!film.comments) {
-            film.comments = [];
-        }
-        film.comments.push(comment);
-
-        
-        
-
-        
-
-        return {
-            status: 201,
-            body: comment
-        };
+    
     }
 });
