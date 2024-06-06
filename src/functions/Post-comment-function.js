@@ -5,7 +5,7 @@ const cosmosInput = input.cosmosDB({
     databaseName: 'FilmDatabase',
     containerName: 'Films',
     connection: 'CosmosDB',
-    sqlQuery: "SELECT * FROM c WHERE c.id = {filmId}",
+    sqlQuery: "SELECT * FROM c WHERE c.id = '1'",
     parameters: [
         {
             name: "@filmId",
@@ -24,7 +24,7 @@ const cosmosOutput = output.cosmosDB({
 app.http('addComment', {
     methods: ['POST'],
     authLevel: 'anonymous',
-    route: 'films/{filmId}/comments',
+    route: 'films/1/comments',
     handler: async (request, context) => {
         try {
             const filmId = context.bindingData.filmId;
