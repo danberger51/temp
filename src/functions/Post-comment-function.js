@@ -59,7 +59,7 @@ app.http('addComment', {
         
         
 
-        console.log(`Updated film document: ${JSON.stringify(film)}`);
+        
 
         return {
             status: 201,
