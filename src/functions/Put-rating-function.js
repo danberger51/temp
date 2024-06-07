@@ -20,7 +20,7 @@ const cosmosOutput = output.cosmosDB({
     createIfNotExists: true,
 });
 
-app.http('putItems', {
+app.http('putIbtems', {
     methods: ['PUT'],
     authLevel: 'anonymous',
     extraInputs: [cosmosInput],
