@@ -4,13 +4,7 @@ const cosmosInput = input.cosmosDB({
     databaseName: 'FilmDatabase',
     containerName: 'Films',
     connection: 'CosmosDB',
-    sqlQuery: "SELECT * FROM c WHERE c.id = @filmId",
-    parameters: [
-        {
-            name: "@filmId",
-            value: ""
-        }
-    ]
+    sqlQuery: "SELECT * FROM c where c.id = {filmId} AND c.ratings.id={ratingId}"
 });
 
 const cosmosOutput = output.cosmosDB({
@@ -25,7 +19,7 @@ app.http('putItems', {
     authLevel: 'anonymous',
     extraInputs: [cosmosInput],
     extraOutputs: [cosmosOutput],
-    route: 'items/{id}',
+    route: 'films/{filmId}/comments/{ratingId}',
     handler: async (request, context) => {
         const items = context.extraInputs.get(cosmosInput);
         const data = await request.json();
