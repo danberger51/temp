@@ -1,5 +1,35 @@
 const { app, context, input, output } = require('@azure/functions');
 
+async function parseRequestBody(request) {
+    try {
+      let requestBody = '';
+      request.on('data', (chunk) => {
+        requestBody += chunk.toString();
+      });
+      
+      await new Promise((resolve, reject) => {
+        request.on('end', resolve);
+        request.on('error', reject);
+      });
+
+      console.log('Request body:', requestBody);
+      
+      if (!requestBody) {
+        console.error('Request body is missing or empty.');
+        throw new Error('Request body is missing or empty.');
+      }
+
+      const parsedBody = JSON.parse(requestBody);
+      console.log('Parsed request body:', parsedBody);
+      return parsedBody;
+    } catch (error) {
+      console.error('Error parsing request body:', error.message);
+      throw new Error('Invalid request body format: ', error.message);
+    }
+}
+
+
+
 const cosmosOutput = output.cosmosDB({
     databaseName: "FilmDatabase",
     containerName: "Films",
@@ -31,11 +61,14 @@ app.http('addComment', {
         console.log("Context:", context);
         console.log("Request:", request);
     
-        const filmId = context.params.filmId; // Access route parameters directly from context
+        const filmId = context.params.filmId; 
         console.log("Film ID:", filmId);
     
         try {
-            const requestBody = await parseRequestBody(request);
+            const requestBody = await parseRequestBody(context.req);
+
+
+ 
             const { userId, comment } = requestBody;
     
             console.log("Request body:", requestBody);
@@ -108,20 +141,3 @@ app.http('addComment', {
         }
     }
 });
-
-async function parseRequestBody(request) {
-    try {
-        // Check if the request body exists and is not empty
-        if (!request || !request.body) {
-            throw new Error('Request body is missing or empty.');
-        }
-        
-        // Parse the request body directly as JSON
-        const requestBody = JSON.parse(request.body);
-        return requestBody;
-    } catch (error) {
-        // If parsing fails, reject the promise with the error
-        throw new Error('Invalid request body format: ' + error.message);
-    }
-}
-
